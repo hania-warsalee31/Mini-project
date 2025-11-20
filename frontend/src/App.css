@@ -29,7 +29,7 @@ body {
   padding: 0 15px;
 }
 
-/* Header Styles */
+/* Header Styles - Updated for Hamburger Menu */
 header {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
@@ -44,6 +44,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .logo {
@@ -54,31 +55,136 @@ header {
 
 .logo i {
   font-size: 2rem;
+  color: var(--accent);
 }
 
 .logo h1 {
   font-size: 1.5rem;
   font-weight: 700;
+  margin: 0;
 }
 
-nav ul {
+/* Hamburger Button Styles */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  gap: 4px;
+  z-index: 1001;
+}
+
+.hamburger-btn span {
+  width: 25px;
+  height: 3px;
+  background: white;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+/* Hamburger Animation */
+.hamburger-btn.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger-btn.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Navigation Styles */
+.nav-menu ul {
   display: flex;
   list-style: none;
+  margin: 0;
+  padding: 0;
   gap: 1.5rem;
 }
 
-nav a {
+.nav-menu a {
   color: white;
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s ease;
-  padding: 5px 10px;
+  padding: 8px 12px;
   border-radius: 4px;
 }
 
-nav a:hover {
+.nav-menu a:hover {
   background-color: rgba(255, 255, 255, 0.2);
+  color: white;
 }
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .hamburger-btn {
+    display: flex;
+  }
+
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 60%;
+    max-width: 300px;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    z-index: 999;
+    transition: right 0.3s ease;
+    padding: 5rem 2rem 2rem;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-menu.active {
+    right: 0;
+  }
+
+  .nav-menu ul {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .nav-menu a {
+    display: block;
+    padding: 1rem 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Remove old mobile menu styles */
+  .mobile-menu-btn {
+    display: none !important;
+  }
+  
+  nav ul.show {
+    display: none !important;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 769px) {
+  .overlay {
+    display: none;
+  }
+}
+
+/* Remove duplicate styles and old header styles *
 
 .mobile-menu-btn {
   display: none;
@@ -90,24 +196,37 @@ nav a:hover {
 }
 
 /* Hero Section */
+/* Hero Section */
 .hero {
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1569163139394-de44cb2c8cb7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
-  background-size: cover;
+  position: relative;
+  background: rgba(0, 0, 0, 0.4) url('/public/Mauritius-map.jpg');
+  background-size: contain;
   background-position: center;
+  background-blend-mode: darken;
   color: white;
   padding: 5rem 0;
   text-align: center;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero .container {
+  position: relative;
+  z-index: 1;
 }
 
 .hero h2 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .hero p {
   font-size: 1.2rem;
   max-width: 700px;
   margin: 0 auto 2rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .btn {
