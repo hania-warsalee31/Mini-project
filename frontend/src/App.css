@@ -31,7 +31,7 @@ body {
   padding: 0 15px;
 }
 
-gi
+
 header {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
@@ -591,4 +591,45 @@ footer {
   .hero p {
     font-size: 1rem;
   }
+
+  /* Typing Indicator */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 10px 0;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+  0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* Enhanced bot message styling for markdown */
+.bot-message ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.bot-message li {
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+.bot-message strong {
+  color: var(--primary);
+}
+
+
+
 }
