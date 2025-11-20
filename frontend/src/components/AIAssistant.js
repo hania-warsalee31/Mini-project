@@ -2,38 +2,78 @@ import React, { useState, useRef, useEffect } from 'react';
 
 const AIAssistant = () => {
   const [messages, setMessages] = useState([
-    { text: "Hello! I'm your PowerGuard AI assistant. How can I help you with energy conservation or outage preparedness today?", isUser: false }
+    { text: "Hello! I'm your PowerGuard AI assistant. How can I help you with energy conservation or outage preparedness in Mauritius today?", isUser: false }
   ]);
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef(null);
 
-  const getBotResponse = (userMessage) => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes('outage') || lowerMessage.includes('blackout')) {
-      return "During an outage, first check if it's only in your home by looking at neighbors' lights. If it's widespread, check our outage alerts section for updates. Unplug sensitive electronics to protect them from power surges when electricity returns.";
-    } else if (lowerMessage.includes('save') || lowerMessage.includes('conserve') || lowerMessage.includes('reduce')) {
-      return "To save energy: 1) Use LED bulbs, 2) Set AC to 24°C, 3) Unplug devices when not in use, 4) Use natural light when possible, 5) Run full loads in washing machines and dishwashers. Small changes can reduce your bill by up to 20%!";
-    } else if (lowerMessage.includes('safety') || lowerMessage.includes('emergency')) {
-      return "Important safety tips: Keep flashlights handy (not candles), have a battery-powered radio, know how to manually open your garage door, and keep phones charged. Create an emergency kit with water, non-perishable food, and first aid supplies.";
-    } else if (lowerMessage.includes('generator')) {
-      return "If using a generator: Always place it outdoors away from windows to prevent carbon monoxide poisoning. Never plug it directly into home wiring - use extension cords. Turn it off before refueling. Follow manufacturer instructions carefully.";
-    } else {
-      return "I'm here to help with energy conservation and outage preparedness. You can ask me about saving electricity, what to do during blackouts, safety measures, or using generators safely. What specific information are you looking for?";
+
+  const GEMINI_API_KEY = "AIzaSyB4lmI7fKnSaL5wtRky9jsltpFeop5Iymg";
+  const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+  const getBotResponse = async (userMessage) => {
+    setIsLoading(true);
+
+    try {
+      const prompt = `You are PowerGuard AI, a specialized assistant for electricity outage management and energy conservation in Mauritius. 
+- Provide practical, actionable advice for Mauritian residents
+- Focus on energy conservation, outage management, and safety
+- Be specific to Mauritius climate and CEB (Central Electricity Board)
+- Keep responses concise and helpful (5 lines max)
+
+USER QUESTION: ${userMessage}
+
+Please provide a helpful response about energy conservation, outage preparedness, or electrical safety in Mauritius.`;
+
+      const response = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "gemini-2.5-flash",
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 800,
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts[0].text) {
+        console.error('Invalid API response format:', data);
+        throw new Error('Invalid response format from API');
+      }
+
+      const aiResponse = data.candidates[0].content.parts[0].text;
+      setIsLoading(false);
+      return aiResponse;
+
+    } catch (error) {
+      console.error('Error calling Gemini API:', error);
+      setIsLoading(false);
+      return `🔧 API Connection Issue: ${error.message}. The AI service is currently unavailable.`;
     }
   };
 
-  const sendMessage = () => {
-    if (inputValue.trim()) {
+  const sendMessage = async () => {
+    if (inputValue.trim() && !isLoading) {
       const userMessage = { text: inputValue, isUser: true };
       setMessages(prev => [...prev, userMessage]);
       setInputValue('');
 
-      setTimeout(() => {
-        const response = getBotResponse(inputValue);
-        const botMessage = { text: response, isUser: false };
-        setMessages(prev => [...prev, botMessage]);
-      }, 1000);
+      const response = await getBotResponse(inputValue);
+      const botMessage = { text: response, isUser: false };
+      setMessages(prev => [...prev, botMessage]);
     }
   };
 
@@ -43,19 +83,8 @@ const AIAssistant = () => {
     }
   }, [messages]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setMessages(prev => [...prev, {
-        text: "You can ask me about: saving energy, outage preparedness, safety tips, or using generators.",
-        isUser: false
-      }]);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isLoading) {
       sendMessage();
     }
   };
@@ -65,7 +94,7 @@ const AIAssistant = () => {
       <div className="container">
         <div className="section-title">
           <h2>AI Energy Assistant</h2>
-          <p>Get personalized advice for energy conservation and outage preparedness</p>
+          <p>Get AI-powered advice for energy conservation and outage preparedness in Mauritius</p>
         </div>
         <div className="assistant-container">
           <div className="chat-container" ref={chatContainerRef}>
@@ -74,6 +103,15 @@ const AIAssistant = () => {
                 {message.text}
               </div>
             ))}
+            {isLoading && (
+              <div className="message bot-message">
+                <div className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            )}
           </div>
           <div className="chat-input">
             <input
@@ -81,10 +119,14 @@ const AIAssistant = () => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me about energy saving tips..."
+              placeholder="Ask about energy saving, outages, or safety..."
+              disabled={isLoading}
             />
-            <button className="btn" onClick={sendMessage}>Send</button>
+            <button className="btn" onClick={sendMessage} disabled={isLoading}>
+              {isLoading ? 'Thinking...' : 'Send'}
+            </button>
           </div>
+          
         </div>
       </div>
     </section>
