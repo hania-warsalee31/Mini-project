@@ -9,6 +9,7 @@ import Quiz from './components/Quiz';
 import EnergyReserve from './components/EnergyReserve';
 import AIAssistant from './components/AIAssistant';
 import Footer from './components/Footer';
+import FloatingFontController from './components/FloatingFontController';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <EnergyReserve />
       <AIAssistant />
       <Footer />
+      
     </div>
   );
 }

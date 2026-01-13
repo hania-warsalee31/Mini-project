@@ -7,6 +7,10 @@ const Header = () => {
     setMenuOpen(!menuOpen);
   };
 
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
+
   return (
     <header>
       <div className="container">
@@ -15,19 +19,32 @@ const Header = () => {
             <i className="fas fa-bolt"></i>
             <h1>PowerGuard Mauritius</h1>
           </div>
-          <button className="mobile-menu-btn" onClick={toggleMenu}>
-            <i className="fas fa-bars"></i>
+          
+          {/* Hamburger Button */}
+          <button 
+            className={`hamburger-btn ${menuOpen ? 'active' : ''}`} 
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
           </button>
-          <nav>
-            <ul className={menuOpen ? 'show' : ''}>
-              <li><a href="#home">Home</a></li>
-              <li><a href="#alerts">Outage Alerts</a></li>
-              <li><a href="#safety">Safety Tips</a></li>
-              <li><a href="#quiz">Energy Quiz</a></li>
-              <li><a href="#reserve">Energy Reserve</a></li>
-              <li><a href="#ai">AI Assistant</a></li>
+
+          {/* Navigation */}
+          <nav className={`nav-menu ${menuOpen ? 'active' : ''}`}>
+            <ul>
+              <li><a href="#home" onClick={closeMenu}>Home</a></li>
+              <li><a href="#alerts" onClick={closeMenu}>Outage Alerts</a></li>
+              <li><a href="#safety" onClick={closeMenu}>Safety Tips</a></li>
+              <li><a href="#quiz" onClick={closeMenu}>Energy Quiz</a></li>
+              <li><a href="#reserve" onClick={closeMenu}>Energy Reserve</a></li>
+              <li><a href="#ai" onClick={closeMenu}>AI Assistant</a></li>
             </ul>
           </nav>
+
+          {/* Overlay for closing menu when clicking outside */}
+          {menuOpen && <div className="overlay" onClick={closeMenu}></div>}
         </div>
       </div>
     </header>
